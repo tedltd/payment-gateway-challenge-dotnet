@@ -13,12 +13,12 @@ namespace PaymentGateway.Api.Extensions
             return response.StatusCode switch
             {
                 HttpStatusCode.OK => new OkObjectResult(response.Payload),
-                HttpStatusCode.BadRequest => new BadRequestObjectResult(errorResponse),
-                HttpStatusCode.PaymentRequired => new ObjectResult(errorResponse) { StatusCode = 402 },
-                HttpStatusCode.RequestTimeout => new ObjectResult(errorResponse) { StatusCode = 408 },
-                HttpStatusCode.ServiceUnavailable => new ObjectResult(errorResponse) { StatusCode = 503 },
-                HttpStatusCode.GatewayTimeout => new ObjectResult(errorResponse) { StatusCode = 504 },
-                _ => new ObjectResult(errorResponse) { StatusCode = 500 }
+                HttpStatusCode.BadRequest => new BadRequestObjectResult(response.Payload),
+                HttpStatusCode.PaymentRequired => new ObjectResult(response.Payload) { StatusCode = 402 },
+                HttpStatusCode.RequestTimeout => new ObjectResult(response.Payload) { StatusCode = 408 },
+                HttpStatusCode.ServiceUnavailable => new ObjectResult(response.Payload) { StatusCode = 503 },
+                HttpStatusCode.GatewayTimeout => new ObjectResult(response.Payload) { StatusCode = 504 },
+                _ => new ObjectResult(response.Payload) { StatusCode = 500 }
             };
         }
     }

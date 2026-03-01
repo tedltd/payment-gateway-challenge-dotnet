@@ -1,5 +1,5 @@
-﻿using PaymentGateway.Api.Services;
-using PaymentGateway.Application.Interfaces;
+﻿using PaymentGateway.Application.Interfaces;
+using PaymentGateway.Application.Services;
 using PaymentGateway.Infrastructure.Clients;
 using PaymentGateway.Infrastructure.Options;
 using PaymentGateway.Infrastructure.Repositories;
@@ -21,13 +21,13 @@ namespace PaymentGateway.Api.Extensions
         {
             services.AddScoped<IPaymentGatewayClient, PaymentGatewayClient>();
             services.AddScoped<IPaymentService, PaymentService>();
-            services.AddScoped<IPaymentRepository, PaymentsRepository>();
+            services.AddScoped<IPaymentRepository, PaymentRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             return services;
         }
         public static IServiceCollection AddTelemetry(this IServiceCollection services)
         {
-            // removed for now, just included to show how we should add telementry
+            // removed for now, just included to show how we should add telemetry
             //services.AddOpenTelemetry()
             //    .WithMetrics(metrics =>
             //    {
@@ -37,7 +37,7 @@ namespace PaymentGateway.Api.Extensions
             //            .AddMeter(PaymentMetrics.MeterName);
                     
             //    });
-            services.AddSingleton<PaymentMetrics>();
+            services.AddSingleton<PaymentMetricsService>();
             return services;
         }
         public static IServiceCollection AddHttpClient(this IServiceCollection services, IConfiguration configuration)

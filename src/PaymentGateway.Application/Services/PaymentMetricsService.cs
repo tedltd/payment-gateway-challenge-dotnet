@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 
-namespace PaymentGateway.Api.Services
+namespace PaymentGateway.Application.Services
 {
-    public class PaymentMetrics
+    public class PaymentMetricsService
     {
         private readonly Counter<long> _paymentProcessedCounter;
         private readonly Counter<long> _paymentFailedCounter;
@@ -14,7 +14,7 @@ namespace PaymentGateway.Api.Services
 
         public const string MeterName = "PaymentApi";
 
-        public PaymentMetrics(IMeterFactory meterFactory)
+        public PaymentMetricsService(IMeterFactory meterFactory)
         {
             var meter = meterFactory.Create(MeterName);
 

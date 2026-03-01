@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+
+using Microsoft.Extensions.Logging;
+
 using PaymentGateway.Application.Interfaces;
 using PaymentGateway.Application.Models;
 using PaymentGateway.Domain.Enums;
@@ -6,21 +9,21 @@ using PaymentGateway.Domain.Request;
 using PaymentGateway.Domain.Response;
 using System.Diagnostics;
 
-namespace PaymentGateway.Api.Services
+namespace PaymentGateway.Application.Services
 {
     public class PaymentService(
         ICurrencyRepository currencyRepository,
         IPaymentRepository paymentRepository,
         IPaymentGatewayClient gatewayClient,
         ILogger<PaymentService> logger,
-        PaymentMetrics metrics,
+        PaymentMetricsService metrics,
         IMapper mapper) : IPaymentService
     {
         private readonly ICurrencyRepository _currencyRepository = currencyRepository;
         private readonly IPaymentRepository _paymentRepository = paymentRepository;
         private readonly IPaymentGatewayClient _gatewayClient = gatewayClient;
         private readonly ILogger<PaymentService> _logger = logger;
-        private readonly PaymentMetrics _metrics = metrics;
+        private readonly PaymentMetricsService _metrics = metrics;
         private readonly IMapper _mapper = mapper;
 
         public async Task<ApiResponse<PostPaymentResponse>> ProcessPaymentAsync(PaymentRequest request, CancellationToken cancellationToken)
@@ -51,7 +54,8 @@ namespace PaymentGateway.Api.Services
                 ExpiryMonth = request.ExpiryMonth,
                 ExpiryYear = int.Parse(request.ExpiryYear),
                 Amount = request.Amount,
-                Status = payload.Authorized ? PaymentStatus.Authorized : PaymentStatus.Declined
+                Status = payload.Authorized ? PaymentStatus.Authorized : PaymentStatus.Declined,
+                Currency = request.Currency
             };
             stopwatch.Stop();
 
@@ -61,7 +65,13 @@ namespace PaymentGateway.Api.Services
             _metrics.RecordPaymentProcessed(request.Currency, request.Amount, paymentResponse.Status);
             _metrics.RecordPaymentDuration(stopwatch.Elapsed.TotalMilliseconds, request.Currency, paymentResponse.Status);
 
-            return new ApiResponse<PostPaymentResponse>(paymentResponse) { StatusCode = gatewayResponse.StatusCode };
+            return new ApiResponse<PostPaymentResponse>(paymentResponse) 
+            { 
+                Success= gatewayResponse.Success,  
+                StatusCode = gatewayResponse.StatusCode, 
+                ErrorMessage = gatewayResponse.ErrorMessage,
+                Message = gatewayResponse.Message
+            };
 
         }
 

@@ -17,7 +17,7 @@ namespace PaymentGateway.Infrastructure.Clients
         private const string HttpClientName = "PaymentGateway";
         private readonly PaymentGatewayOptions _options = options.Value;
 
-        public async Task<ApiResponse<PaymentGatewayResponse?>> ProcessPaymentAsync(PaymentGatewayRequest request, CancellationToken cancellationToken)
+        public async Task<ApiResponse<PaymentGatewayResponse>> ProcessPaymentAsync(PaymentGatewayRequest request, CancellationToken cancellationToken)
         {
             var httpClient = _httpClientFactory.CreateClient(HttpClientName);
 
@@ -27,12 +27,27 @@ namespace PaymentGateway.Infrastructure.Clients
 
             var response = await httpClient.PostAsJsonAsync(fullUrl, request, cancellationToken);
             var result = await response.Content.ReadFromJsonAsync<PaymentGatewayResponse>(cancellationToken: cancellationToken);
-            return new ApiResponse<PaymentGatewayResponse?>
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogError("Payment gateway returned error. Status: {StatusCode}, Response: {Response}", response.StatusCode, errorContent);
+
+                return new ApiResponse<PaymentGatewayResponse>
+                {
+                    Success = false,
+                    Payload = result,
+                    StatusCode = response.StatusCode,
+                    Message = "Payment processing failed",
+                    ErrorMessage = $"Gateway returned {response.StatusCode}: {errorContent}"
+                };
+            }
+
+            return new ApiResponse<PaymentGatewayResponse>
             {
                 Success = true,
                 Payload = result,
                 StatusCode = response.StatusCode,
-                Message = "Payment processed by gateway"
+                Message = "Payment processed"
             };
         }
     }

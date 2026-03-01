@@ -5,6 +5,6 @@ namespace PaymentGateway.Application.Interfaces
 {
     public interface IPaymentGatewayClient
     {
-        Task<ApiResponse<PaymentGatewayResponse?>> ProcessPaymentAsync(PaymentGatewayRequest request, CancellationToken cancellationToken);
+        Task<ApiResponse<PaymentGatewayResponse>> ProcessPaymentAsync(PaymentGatewayRequest request, CancellationToken cancellationToken);
     }
 }

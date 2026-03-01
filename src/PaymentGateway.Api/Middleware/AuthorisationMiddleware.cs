@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using PaymentGateway.Api.Services;
 using PaymentGateway.Api.Attributes;
+using PaymentGateway.Application.Services;
 
 namespace PaymentGateway.Api.Attributes
 {
@@ -23,7 +23,7 @@ namespace PaymentGateway.Api.Middleware
             _expectedApiKey = configuration["ApiKey"];
         }
 
-        public async Task InvokeAsync(HttpContext context, PaymentMetrics metrics)
+        public async Task InvokeAsync(HttpContext context, PaymentMetricsService metrics)
         {
             var endpoint = context.GetEndpoint();
 

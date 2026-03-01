@@ -37,21 +37,17 @@ namespace PaymentApi.Validators
 
                     if (expiry < current)
                     {
-                        var message = "ExpiryDateInPast" ?? "Expiry date must be the current month or later.";
+                        var message = $"Card expiry date {req.ExpiryMonth:D2}/{req.ExpiryYear} has expired. Please provide a valid expiry date.";
 
-                        var yearFailure = new ValidationFailure(nameof(req.ExpiryYear), message)
+                        ctx.AddFailure(new ValidationFailure(nameof(req.ExpiryMonth), message)
                         {
                             ErrorCode = "EXPIRY_DATE_PAST",
-                            CustomState = new { attempted = $"{req.ExpiryMonth}/{req.ExpiryYear}" }
-                        };
-                        var monthFailure = new ValidationFailure(nameof(req.ExpiryMonth), message)
-                        {
-                            ErrorCode = "EXPIRY_DATE_PAST",
-                            CustomState = new { attempted = $"{req.ExpiryMonth}/{req.ExpiryYear}" }
-                        };
-
-                        ctx.AddFailure(yearFailure);
-                        ctx.AddFailure(monthFailure);
+                            CustomState = new
+                            {
+                                providedDate = $"{req.ExpiryMonth:D2}/{req.ExpiryYear}",
+                                reason = "expired"
+                            }
+                        });
                     }
                 }
                 catch (ArgumentOutOfRangeException)

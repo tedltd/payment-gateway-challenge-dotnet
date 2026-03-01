@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 
 using PaymentGateway.Api.Extensions;
-using PaymentGateway.Api.Services;
+using PaymentGateway.Application.Services;
 using PaymentGateway.Domain.Request;
 
 using System.Text;
@@ -24,7 +24,7 @@ namespace PaymentGateway.Api.Middleware
             _logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context, PaymentMetrics metrics)
+        public async Task InvokeAsync(HttpContext context, PaymentMetricsService metrics)
         {
             var path = context.Request.Path.Value ?? string.Empty;
             var method = context.Request.Method;
@@ -44,7 +44,7 @@ namespace PaymentGateway.Api.Middleware
             await _next(context).ConfigureAwait(false);
         }
 
-        private async Task ValidatePostRequest(HttpContext context, PaymentMetrics metrics)
+        private async Task ValidatePostRequest(HttpContext context, PaymentMetricsService metrics)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace PaymentGateway.Api.Middleware
             }
         }
 
-        private async Task ValidateGetRequest(HttpContext context, PaymentMetrics metrics)
+        private async Task ValidateGetRequest(HttpContext context, PaymentMetricsService metrics)
         {
             try
             {
